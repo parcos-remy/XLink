@@ -260,34 +260,11 @@ extern "C" xLinkPlatformErrorCode_t refLibusbDeviceByName(const char* name, libu
 
 
 
-std::string getLibusbDevicePath(libusb_device *dev) {
-
-    std::string devicePath = "";
-
-    // Add bus number
-    uint8_t bus = libusb_get_bus_number(dev);
-    devicePath += std::to_string(bus) + ".";
-
-    // Add all subsequent port numbers
-    uint8_t portNumbers[MAXIMUM_PORT_NUMBERS];
-    int count = libusb_get_port_numbers(dev, portNumbers, MAXIMUM_PORT_NUMBERS);
-    if (count == LIBUSB_ERROR_OVERFLOW) {
-        // shouldn't happen!
-        return "<error>";
-    }
-    if(count == 0){
-        // Only bus number is available
-        return devicePath;
-    }
-
-    for (int i = 0; i < count - 1; i++){
-        devicePath += std::to_string(portNumbers[i]) + ".";
-    }
-    devicePath += std::to_string(portNumbers[count - 1]);
-
-    // Return the device path
-    return devicePath;
+std::string getLibusbDevicePath(libusb_device *dev) 
+{
+    return std::string("address_") + std::to_string(libusb_get_device_address(dev));
 }
+
 
 libusb_error getLibusbDeviceMxId(XLinkDeviceState_t state, std::string devicePath, const libusb_device_descriptor* pDesc, libusb_device *dev, std::string& outMxId)
 {
